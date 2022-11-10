@@ -1,0 +1,35 @@
+// ILRewriter.idl : IDL source for ILRewriter
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ILRewriter.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+    object,
+    uuid(7d34c41b-f3ed-473e-a6c2-cbd06942a50b),
+    helpstring("IILRewriter Interface"),
+    version(1.0),
+    pointer_default(unique)
+]
+interface IILRewriter : IUnknown {
+};
+[
+    uuid(e0145544-414d-487e-9219-178b87ff0aaa),
+    version(1.0),
+    helpstring("ILRewriter 1.0 Type Library")
+]
+library ILRewriterLib
+{
+    importlib("stdole2.tlb");
+    [
+        uuid(b45048d5-6f44-4fbe-ae88-b468a5e4927a),
+        helpstring("Profiler Class")
+    ]
+    coclass ILRewriter
+    {
+        [default] interface IUnknown;
+    };
+};
