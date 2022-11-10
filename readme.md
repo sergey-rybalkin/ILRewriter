@@ -24,7 +24,7 @@ Sample configuration file:
     SET ILREWRITER_MDTOKEN=107965719
     SET ILREWRITER_PATCH=100=23;11=0
     
-This configuration will wait for the method with MD Token 107965719 to be JIT compiled and replace bytes at offsets 198 and 199 with 23 (IL ldc.i4.1) and 0 (IL nop).
+This configuration will wait for the method with MD Token 107965719 to be JIT compiled and replace bytes at offsets 100 and 11 with 23 (IL ldc.i4.1) and 0 (IL nop).
 
 ## Building
 
