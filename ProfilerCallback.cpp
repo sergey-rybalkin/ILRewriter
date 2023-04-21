@@ -63,7 +63,8 @@ HRESULT __stdcall ProfilerCallback::Initialize(IUnknown* pICorProfilerInfoUnk)
         m_bytesToReplace.emplace(key, value);
     }
 
-    if (SUCCEEDED(pICorProfilerInfoUnk->QueryInterface(IID_ICorProfilerInfo2, (LPVOID*)&m_iCorProfilerInfo)))
+    if (SUCCEEDED(
+        pICorProfilerInfoUnk->QueryInterface(IID_ICorProfilerInfo2, (LPVOID*)&m_iCorProfilerInfo)))
     {
         DWORD dwEventMask = COR_PRF_MONITOR_JIT_COMPILATION;
         m_iCorProfilerInfo->SetEventMask(dwEventMask);
@@ -171,12 +172,18 @@ HRESULT __stdcall ProfilerCallback::JITCompilationStarted(FunctionID functionID,
 {
     ModuleID module;
     mdToken token;
-    mdTypeDef type;
     ClassID classId;
     if (FAILED(m_iCorProfilerInfo->GetFunctionInfo(functionID, &classId, &module, &token)))
         return S_OK;
 
     if (token != m_lTargetMdToken)
+        return S_OK;
+
+    // As MD Token may exist in multiple assemblies we will need to check assembly name before the update.
+    WCHAR moduleName[MAX_PATH];
+    ULONG bufferSize = MAX_PATH;
+    if (FAILED(m_iCorProfilerInfo->GetModuleInfo(module, NULL, bufferSize, &bufferSize, moduleName, NULL)) ||
+        StrStrW(moduleName, L"NDepend.Core.dll") == NULL)
         return S_OK;
 
     // Get method body for the target method as bytes array
@@ -195,6 +202,10 @@ HRESULT __stdcall ProfilerCallback::JITCompilationStarted(FunctionID functionID,
     // Replace method body with our updated version. This does not seem to modify assembly or its in-memory
     // version so software protection cannot detect those changes.
     m_iCorProfilerInfo->SetILFunctionBody(module, token, newBytes);
+
+#ifdef DEBUG
+    OutputDebugStringW(L"ILRewrite: function body updated");
+#endif // DEBUG
 
     return S_OK;
 }
